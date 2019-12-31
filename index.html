@@ -29,7 +29,7 @@
                         <button class="btn btn-outline-secondary" type="button" id="SearchBtn">Button</button>
                     </div>
                 </div>
-                <div class="cityHistory">
+                <div id="cityHistory">
 
                 </div>
             </div>
@@ -42,16 +42,16 @@
                 <div class="row">
                     <div class="col">
                         <div id="cityTemp">
-                          
+
                         </div>
                         <div id="cityHum">
-                            
+
                         </div>
                         <div id="cityWindS">
-                            
+
                         </div>
                         <div id="UVIndex">
-                            
+
                         </div>
                     </div>
                 </div>
@@ -80,8 +80,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script type="text/javascript">
 
-       
-
+var storedCities = JSON.parse(localStorage.getItem("cities"));
+var cityArray = [];
+renderCityBtns()
 
         function renderForecast(auxRes) {
             var forecastDiv = $("#cityForecast").empty();
@@ -90,10 +91,9 @@
             for (var i = 5; i < auxRes.list.length; i += 8) {
 
                 var auxDiv = $("<div class = 'col-2'>").attr("id", i);
-                console.log(i);
                 date = $("<div>").text(auxRes.list[i].dt_txt);
                 icon = $("<img>").attr("src", "http:openweathermap.org/img/wn/" + auxRes.list[i].weather[0].icon + "@2x.png");
-                temp = $("<div>").text("Temp: " + auxRes.list[i].main.temp + "°F");// icon link http://openweathermap.org/img/wn/+ icon code +@2x.png
+                temp = $("<div>").text("Temp: " + auxRes.list[i].main.temp + "°F");
                 humidity = $("<div>").text("Humidity: " + auxRes.list[i].main.humidity + "%");
                 forecastDiv.append(auxDiv.append(date, icon, temp, humidity));
             }
@@ -106,21 +106,9 @@
             $("#cityHum").text("Humidity: " + auxRex.main.humidity + "%")
             $("#cityWindS").text("Wind Speed: " + auxRex.wind.speed + " MPH");
             $("#UVIndex").text("UVIndex: ");
-
-
-
-
-            console.log(response.main.temp);//temperature
-            console.log(response.main.feels_like);//feels like temperature
-            console.log(response.name);//name
-            console.log(response.main.humidity);//humidity
-            console.log(response.wind);//wind
-            console.log(response.weather[0].description); //weather description
-            //console.log(response.main.//
         }
 
-        function AskAjax(queryText){
-            console.log("inside the function")
+        function AskAjax(queryText) {
             var APIKey = "a7bd77b04beba420ad9eb5dbe7386e23";
             var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + queryText + "&units=imperial&appid=" + APIKey;
             $.ajax({
@@ -128,6 +116,8 @@
                 method: "GET"
             }).then(function (response) {
                 renderWeather(response)
+                cityArray.push(response.name);
+                renderCityBtns();
             });
 
             $.ajax({
@@ -137,16 +127,36 @@
                 renderForecast(response);
             });
 
-           
+
+        }
+
+        function renderCityBtns() {
+            $("#cityHistory").empty();
+            if (storedCities) {
+                cityArray = storedCities;
+            } else {
+                localStorage.setItem("cities", JSON.stringify(cityArray));
+                return;
+            }
+            console.log(cityArray)
+            var a
+            var history = $("#cityHistory");
+            cityArray.forEach(function (element) {
+                a = $("<button class ='cityBtn' data-name = '" + element + "'>").text(element);
+                    console.log(element)
+                history.append(a);
+            });
+            localStorage.setItem("cities", JSON.stringify(cityArray));
         }
 
         $("#SearchBtn").on("click", function (evt) {
-                evt.preventDefault();
-                if ($("#cityInput").val()) {
-                    AskAjax($("#cityInput").val());
-                    $("#cityInput").val("");
-                }
-            });
+            evt.preventDefault();
+            if ($("#cityInput").val()) {
+                AskAjax($("#cityInput").val());
+                
+                $("#cityInput").val("");
+            }
+        });
 
     </script>
 
