@@ -13,61 +13,52 @@
 
 <body>
     <div class="container">
-        <div class="jumbotron col-12 mt-3">
-            <h1 class="display-4">Weather Checker</h1>
-            <p class="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention
-                to featured content or information.</p>
-            <hr class="my-4">
-            <p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
+        <div class="row">
+            <h1 class="col">
+                Weather Dashboard
+            </h1>
+        </div>
 
-            <form class="form-inline">
-                <div class="form-group mb-2">
-                    <label for="staticEmail2" class="sr-only">Email</label>
-                    <input type="text" readonly class="form-control-plaintext" id="staticEmail2"
-                        value="Where are you going?">
+        <div class="row">
+            <div class="col-3">
+                <label for="cityInput">Search for a City </label>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Recipient's username"
+                        aria-label="Recipient's username" aria-describedby="button-addon2" id="cityInput">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" id="SearchBtn">Button</button>
+                    </div>
                 </div>
-                <div class="form-group mx-sm-3 mb-2">
-                    <label for="inputPassword2" class="sr-only">Destination</label>
-                    <input type="text" class="form-control" id="inputPassword2" placeholder="Destination">
+                <div class="cityHistory">
+
                 </div>
-                <button type="submit" class="btn btn-primary mb-2">Get Started</button>
-            </form>
-        </div>
-    </div>
-
-    <div class="container">
-        <div id="citydataDiv">
-            <div id="cityNameDiv">
-
             </div>
-            <div id="dateDiv">
+            <div class="col-9">
+                <div class="row" id="CurrentConditions">
+                    <h2 id="cityName">
 
+                    </h2>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div id="cityTemp">
+                          
+                        </div>
+                        <div id="cityHum">
+                            
+                        </div>
+                        <div id="cityWindS">
+                            
+                        </div>
+                        <div id="UVIndex">
+                            
+                        </div>
+                    </div>
+                </div>
+                <div class="row" id="cityForecast">
+
+                </div>
             </div>
-        </div>
-
-
-        <div id="cityCurrentDataDiv">
-            <div id="iconImage">
-
-            </div>
-            <div id="tempDiv">
-
-            </div>
-            <div id="humidityDiv">
-
-            </div>
-            <div id="windDiv">
-
-            </div>
-            <div id="UVDiv">
-
-            </div>
-        </div>
-
-
-
-        <div id="5dayForecastDiv">
-       
         </div>
     </div>
 
@@ -89,15 +80,35 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script type="text/javascript">
 
-        var APIKey = "a7bd77b04beba420ad9eb5dbe7386e23";
-        var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + "madrid" + "&units=imperial&appid=" + APIKey;
-        console.log("algo intenta")
-        $.ajax({
-            url: queryURL,
-            method: "GET"
-        }).then(function (response) {
+       
 
-            console.log(response)
+
+        function renderForecast(auxRes) {
+            var forecastDiv = $("#cityForecast").empty();
+            forecastDiv
+            var icon, date, temp, humidity;
+            for (var i = 5; i < auxRes.list.length; i += 8) {
+
+                var auxDiv = $("<div class = 'col-2'>").attr("id", i);
+                console.log(i);
+                date = $("<div>").text(auxRes.list[i].dt_txt);
+                icon = $("<img>").attr("src", "http:openweathermap.org/img/wn/" + auxRes.list[i].weather[0].icon + "@2x.png");
+                temp = $("<div>").text("Temp: " + auxRes.list[i].main.temp + "°F");// icon link http://openweathermap.org/img/wn/+ icon code +@2x.png
+                humidity = $("<div>").text("Humidity: " + auxRes.list[i].main.humidity + "%");
+                forecastDiv.append(auxDiv.append(date, icon, temp, humidity));
+            }
+        }
+
+        function renderWeather(auxRex) {
+            var name, date, temp, humidity, UVIndex, windS;
+            $("#cityName").text(auxRex.name + " (" + "fechahehe" + ")");
+            $("#cityTemp").text(auxRex.main.temp + "°F");
+            $("#cityHum").text("Humidity: " + auxRex.main.humidity + "%")
+            $("#cityWindS").text("Wind Speed: " + auxRex.wind.speed + " MPH");
+            $("#UVIndex").text("UVIndex: ");
+
+
+
 
             console.log(response.main.temp);//temperature
             console.log(response.main.feels_like);//feels like temperature
@@ -106,30 +117,36 @@
             console.log(response.wind);//wind
             console.log(response.weather[0].description); //weather description
             //console.log(response.main.//
-        });
+        }
 
-        // $("button").on("click", function () {
-        //     var animal = $(this).attr("data-animal");
+        function AskAjax(queryText){
+            console.log("inside the function")
+            var APIKey = "a7bd77b04beba420ad9eb5dbe7386e23";
+            var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + queryText + "&units=imperial&appid=" + APIKey;
+            $.ajax({
+                url: queryURL,
+                method: "GET"
+            }).then(function (response) {
+                renderWeather(response)
+            });
 
-        // });
+            $.ajax({
+                url: `https://api.openweathermap.org/data/2.5/forecast?q=${queryText}&units=imperial&appid=${APIKey} `,
+                method: "GET"
+            }).then(function (response) {
+                renderForecast(response);
+            });
 
-        $.ajax({
-            url: `https://api.openweathermap.org/data/2.5/forecast?q=london,uk&appid=${APIKey} `,
-            method: "GET"
-        }).then(function (response) {
-            console.log("ALGOINTENTA");
-            console.log(queryURL);
+           
+        }
 
-            console.log(response)
-
-        });
-
-        $("button").on("click", function () {
-            var animal = $(this).attr("data-animal");
-
-        });
-
-
+        $("#SearchBtn").on("click", function (evt) {
+                evt.preventDefault();
+                if ($("#cityInput").val()) {
+                    AskAjax($("#cityInput").val());
+                    $("#cityInput").val("");
+                }
+            });
 
     </script>
 
