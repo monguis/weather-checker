@@ -116,8 +116,11 @@ renderCityBtns()
                 method: "GET"
             }).then(function (response) {
                 renderWeather(response)
-                cityArray.push(response.name);
+                    if(!cityArray.includes(response.name)){
+                    cityArray.push(response.name);
+                    
                 renderCityBtns();
+                }
             });
 
             $.ajax({
@@ -157,6 +160,11 @@ renderCityBtns()
                 $("#cityInput").val("");
             }
         });
+        $("#cityHistory").on("click", ".cityBtn",function(evt){
+           evt.preventDefault();
+           console.log("entro al evento");
+           AskAjax($(this).attr("data-name"));
+       })
 
     </script>
 
