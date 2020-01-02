@@ -14,33 +14,34 @@
 <body>
     <div class="container">
         <div class="row">
-            <h1 class="col">
+            <h1 class="col bg-dark text-light text-center p-2 mr-2">
                 Weather Dashboard
             </h1>
         </div>
 
         <div class="row">
-            <div class="col-3">
-                <label for="cityInput">Search for a City </label>
+            <div class="col-3 bg-light p-2">
+                <label for="cityInput" class="font-weight-bold">Search for a City:</label>
                 <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="Recipient's username"
-                        aria-label="Recipient's username" aria-describedby="button-addon2" id="cityInput">
+                    <input type="text" class="form-control" aria-label="Recipient's username"
+                        aria-describedby="button-addon2" id="cityInput">
                     <div class="input-group-append">
-                        <button class="btn btn-outline-secondary" type="button" id="SearchBtn">Button</button>
+                        <button class="btn btn-outline-secondary bg-primary" type="button"
+                            id="SearchBtn">Button</button>
                     </div>
                 </div>
-                <div id="cityHistory">
+                <div id="cityHistory" class="list-group">
 
                 </div>
             </div>
-            <div class="col-9">
-                <div class="row" id="CurrentConditions">
-                    <h2 id="cityName">
+            <div class="col-9 ">
+                <div class="row border m-2" id="CurrentConditions">
 
-                    </h2>
-                </div>
-                <div class="row">
-                    <div class="col">
+
+                    <div class="col p-3">
+                        <h2 id="cityName">
+
+                        </h2>
                         <div id="cityTemp">
 
                         </div>
@@ -55,7 +56,14 @@
                         </div>
                     </div>
                 </div>
-                <div class="row" id="cityForecast">
+                <div class="row">
+
+                    <h3 id="forecastTitle" class="m-2">
+
+                    </h3>
+
+                </div>
+                <div class="row" id="cityForecast" class="m-2">
 
                 </div>
             </div>
@@ -80,17 +88,22 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script type="text/javascript">
 
-var storedCities = JSON.parse(localStorage.getItem("cities"));
-var cityArray = [];
-renderCityBtns()
+        var storedCities = JSON.parse(localStorage.getItem("cities"));
+        var cityArray = [];
+        if (!storedCities){
+                localStorage.setItem("cities", JSON.stringify(cityArray));
+        } else {
+            cityArray = storedCities;
+        }
+        renderCityBtns()
 
         function renderForecast(auxRes) {
             var forecastDiv = $("#cityForecast").empty();
-            forecastDiv
+            $("#forecastTitle").text("5 Day Forecast:");
             var icon, date, temp, humidity;
             for (var i = 5; i < auxRes.list.length; i += 8) {
 
-                var auxDiv = $("<div class = 'col-2'>").attr("id", i);
+                var auxDiv = $("<div class = 'col-2 p-3 m-2 bg-primary text-white rounded'>").attr("id", i);
                 date = $("<div>").text(auxRes.list[i].dt_txt);
                 icon = $("<img>").attr("src", "http:openweathermap.org/img/wn/" + auxRes.list[i].weather[0].icon + "@2x.png");
                 temp = $("<div>").text("Temp: " + auxRes.list[i].main.temp + "°F");
@@ -99,9 +112,16 @@ renderCityBtns()
             }
         }
 
+
+
+
         function renderWeather(auxRex) {
-            var name, date, temp, humidity, UVIndex, windS;
-            $("#cityName").text(auxRex.name + " (" + "fechahehe" + ")");
+            var today = new Date();
+            var dd = String(today.getDate()).padStart(2, '0');
+            var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+            var yyyy = today.getFullYear();
+            $("#cityName").text(auxRex.name + " (" + mm + '/' + dd + '/' + yyyy+ ")");
+            $("#cityName").append($(`<img src = http:openweathermap.org/img/wn/${auxRex.weather[0].icon}@2x.png>`));
             $("#cityTemp").text(auxRex.main.temp + "°F");
             $("#cityHum").text("Humidity: " + auxRex.main.humidity + "%")
             $("#cityWindS").text("Wind Speed: " + auxRex.wind.speed + " MPH");
@@ -115,12 +135,13 @@ renderCityBtns()
                 url: queryURL,
                 method: "GET"
             }).then(function (response) {
+                console.log(response);
                 renderWeather(response)
-                    if(!cityArray.includes(response.name)){
+                if (!cityArray.includes(response.name)) {
                     cityArray.push(response.name);
-                    
-                renderCityBtns();
+                    console.log("before the function "+ cityArray)
                 }
+                renderCityBtns();
             });
 
             $.ajax({
@@ -135,18 +156,13 @@ renderCityBtns()
 
         function renderCityBtns() {
             $("#cityHistory").empty();
-            if (storedCities) {
-                cityArray = storedCities;
-            } else {
-                localStorage.setItem("cities", JSON.stringify(cityArray));
-                return;
-            }
+            
             console.log(cityArray)
             var a
             var history = $("#cityHistory");
             cityArray.forEach(function (element) {
-                a = $("<button class ='cityBtn' data-name = '" + element + "'>").text(element);
-                    console.log(element)
+                a = $("<a href='#' class='list-group-item list-group-item-action' data-name = '" + element + "'>").text(element);
+                console.log(element)
                 history.append(a);
             });
             localStorage.setItem("cities", JSON.stringify(cityArray));
@@ -156,15 +172,14 @@ renderCityBtns()
             evt.preventDefault();
             if ($("#cityInput").val()) {
                 AskAjax($("#cityInput").val());
-                
                 $("#cityInput").val("");
+                console.log(cityArray)
             }
         });
-        $("#cityHistory").on("click", ".cityBtn",function(evt){
-           evt.preventDefault();
-           console.log("entro al evento");
-           AskAjax($(this).attr("data-name"));
-       })
+        $("#cityHistory").on("click", ".list-group-item", function (evt) {
+            evt.preventDefault();
+            AskAjax($(this).attr("data-name"));
+        })
 
     </script>
 
