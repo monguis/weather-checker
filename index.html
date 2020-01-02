@@ -8,7 +8,7 @@
     <title>Weather Checker</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-
+        <script src="https://kit.fontawesome.com/22ff5ec687.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -20,21 +20,21 @@
         </div>
 
         <div class="row">
-            <div class="col-3 bg-light p-2">
+            <div class="col-md-3 bg-light p-2 col-sm-12">
                 <label for="cityInput" class="font-weight-bold">Search for a City:</label>
                 <div class="input-group mb-3">
                     <input type="text" class="form-control" aria-label="Recipient's username"
                         aria-describedby="button-addon2" id="cityInput">
                     <div class="input-group-append">
                         <button class="btn btn-outline-secondary bg-primary" type="button"
-                            id="SearchBtn">Button</button>
+                            id="SearchBtn"><i class="fas fa-search"></i></button>
                     </div>
                 </div>
                 <div id="cityHistory" class="list-group">
 
                 </div>
             </div>
-            <div class="col-9 ">
+            <div class="col-md-9 col-sm-12">
                 <div class="row border m-2" id="CurrentConditions">
 
 
@@ -103,7 +103,7 @@
             var icon, date, temp, humidity;
             for (var i = 5; i < auxRes.list.length; i += 8) {
 
-                var auxDiv = $("<div class = 'col-2 p-3 m-2 bg-primary text-white rounded'>").attr("id", i);
+                var auxDiv = $("<div class = 'col-lg-2 col-sm-12 col-md-3 p-3 m-2 bg-primary text-white rounded'>").attr("id", i);
                 date = $("<div>").text(auxRes.list[i].dt_txt);
                 icon = $("<img>").attr("src", "http:openweathermap.org/img/wn/" + auxRes.list[i].weather[0].icon + "@2x.png");
                 temp = $("<div>").text("Temp: " + auxRes.list[i].main.temp + "°F");
